@@ -1,0 +1,2721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vodafone India: Strategic Crisis Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --crimson: #DC143C;
+            --deep-red: #8B0000;
+            --charcoal: #2C2C2C;
+            --slate: #4A4A4A;
+            --cream: #F5F5DC;
+            --gold: #D4AF37;
+            --light-gray: #E8E8E8;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: var(--cream);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--crimson), var(--gold));
+            animation: expandWidth 1s ease-out;
+        }
+
+        @keyframes expandWidth {
+            from { width: 0; }
+            to { width: 100px; }
+        }
+
+        h1 {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--crimson), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--light-gray);
+            font-weight: 300;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .game-card {
+            background: rgba(42, 42, 42, 0.95);
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--crimson), var(--gold));
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .decision-header {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .company-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-box {
+            background: rgba(220, 20, 60, 0.1);
+            border: 1px solid rgba(220, 20, 60, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            background: rgba(220, 20, 60, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(220, 20, 60, 0.2);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--light-gray);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .indicator-green {
+            background: linear-gradient(90deg, #4CAF50, #66BB6A);
+        }
+
+        .indicator-amber {
+            background: linear-gradient(90deg, #FF9800, #FFA726);
+        }
+
+        .indicator-red {
+            background: linear-gradient(90deg, #DC143C, #E91E63);
+        }
+
+        .stat-percentage {
+            font-size: 0.9rem;
+            color: var(--light-gray);
+            margin-top: 5px;
+        }
+
+        .critical-notice {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.2), rgba(139, 0, 0, 0.2));
+            border: 2px solid var(--crimson);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gold);
+            text-align: center;
+            box-shadow: 0 0 30px rgba(220, 20, 60, 0.4);
+            animation: warningFadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes warningFadeIn {
+            0% { 
+                opacity: 0;
+                transform: translateY(-10px);
+                box-shadow: 0 0 10px rgba(220, 20, 60, 0.2);
+            }
+            100% { 
+                opacity: 1;
+                transform: translateY(0);
+                box-shadow: 0 0 30px rgba(220, 20, 60, 0.4);
+            }
+        }
+
+        .learning-category {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+        }
+
+        .question-section {
+            background: rgba(74, 74, 74, 0.3);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid var(--crimson);
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: var(--cream);
+            margin-bottom: 30px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(220, 20, 60, 0.4);
+            padding: 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(220, 20, 60, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .option-card:hover::before {
+            left: 100%;
+        }
+
+        .option-card:hover {
+            background: rgba(220, 20, 60, 0.15);
+            border-color: var(--gold);
+            transform: translateX(10px);
+            box-shadow: 0 10px 40px rgba(220, 20, 60, 0.3);
+        }
+
+        .option-letter {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: var(--crimson);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: 700;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .option-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .option-description {
+            color: var(--light-gray);
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .impact-item {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .impact-label {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .analysis-section {
+            background: rgba(42, 42, 42, 0.8);
+            border: 2px solid var(--gold);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            display: none;
+        }
+
+        .analysis-section.show {
+            display: block;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .analysis-title {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .data-point {
+            background: rgba(220, 20, 60, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--crimson);
+            border-radius: 8px;
+        }
+
+        .data-point h4 {
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .data-point p {
+            color: var(--light-gray);
+            line-height: 1.8;
+        }
+
+        .key-learnings {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--gold);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .key-learnings h3 {
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-family: 'Libre Baskerville', serif;
+        }
+
+        .key-learnings ul {
+            list-style: none;
+        }
+
+        .key-learnings li {
+            padding: 12px 0 12px 30px;
+            position: relative;
+            color: var(--cream);
+            line-height: 1.6;
+        }
+
+        .key-learnings li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--crimson);
+            font-size: 1.5rem;
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, var(--crimson), var(--deep-red));
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 30px auto;
+            display: block;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 30px rgba(220, 20, 60, 0.4);
+        }
+
+        .next-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(220, 20, 60, 0.6);
+            background: linear-gradient(135deg, #ff1744, var(--crimson));
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Live Balance Sheet Snapshot Styles */
+        .balance-sheet-snapshot {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.15), rgba(212, 175, 55, 0.15));
+            border: 2px solid var(--gold);
+            border-radius: 15px;
+            padding: 35px;
+            margin: 40px 0;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .balance-sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.4);
+        }
+
+        .balance-sheet-title {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(76, 175, 80, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+        }
+
+        .live-pulse {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .financial-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--crimson), var(--gold));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.6s ease;
+        }
+
+        .metric-card.updated::before {
+            transform: scaleX(1);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .metric-label-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--light-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .metric-description {
+            font-size: 0.7rem;
+            color: rgba(245, 245, 220, 0.5);
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 400;
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        .metric-change {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .metric-change.negative {
+            background: rgba(220, 20, 60, 0.2);
+            color: #DC143C;
+        }
+
+        .metric-change.neutral {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light-gray);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 8px;
+            font-family: 'DM Sans', monospace;
+        }
+
+        .metric-subtext {
+            font-size: 0.8rem;
+            color: rgba(245, 245, 220, 0.6);
+            font-style: italic;
+        }
+
+        .credit-rating-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .rating-badge {
+            font-size: 2.5rem;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Libre Baskerville', serif;
+            min-width: 100px;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        .rating-AAA, .rating-AA { 
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .rating-A, .rating-BBB { 
+            background: linear-gradient(135deg, #2196F3, #42A5F5);
+            color: white;
+            box-shadow: 0 5px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .rating-BB, .rating-B { 
+            background: linear-gradient(135deg, #FF9800, #FFA726);
+            color: white;
+            box-shadow: 0 5px 20px rgba(255, 152, 0, 0.4);
+        }
+
+        .rating-CCC, .rating-CC, .rating-C { 
+            background: linear-gradient(135deg, #DC143C, #E91E63);
+            color: white;
+            box-shadow: 0 5px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .rating-D { 
+            background: linear-gradient(135deg, #8B0000, #4A0000);
+            color: white;
+            box-shadow: 0 5px 20px rgba(139, 0, 0, 0.5);
+        }
+
+        .rating-info {
+            flex: 1;
+        }
+
+        .rating-title {
+            font-size: 0.9rem;
+            color: var(--light-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .rating-description {
+            font-size: 0.95rem;
+            color: var(--cream);
+            line-height: 1.5;
+        }
+
+        .impact-alert {
+            background: rgba(220, 20, 60, 0.15);
+            border-left: 4px solid var(--crimson);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--cream);
+            line-height: 1.6;
+        }
+
+        .impact-alert strong {
+            color: var(--gold);
+        }
+
+        .performance-graph-container {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            border-radius: 15px;
+            margin: 40px 0;
+            border: 2px solid var(--gold);
+        }
+
+        .graph-title {
+            font-family: 'Libre Baskerville', serif;
+            color: var(--gold);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        #performanceChart1, #performanceChart2, #performanceChart3, #performanceChart4, #performanceChart5 {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 400px;
+        }
+
+        .graph-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--cream);
+            font-size: 0.95rem;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .page-transition {
+            animation: pageSlideIn 0.6s ease-out;
+        }
+
+        @keyframes pageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bar-label {
+            min-width: 150px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--crimson), var(--gold));
+            border-radius: 15px;
+            transition: width 1.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .outcome-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin: 10px 5px;
+            font-size: 0.9rem;
+        }
+
+        .outcome-positive {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .outcome-negative {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #F44336;
+            color: #F44336;
+        }
+
+        .outcome-neutral {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #FFC107;
+            color: #FFC107;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .game-card {
+                padding: 30px 20px;
+            }
+            
+            .decision-header {
+                font-size: 1.5rem;
+            }
+        }
+
+        .analysis-reveal-btn {
+            display: block;
+            margin: 35px auto 10px;
+            background: transparent;
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            padding: 16px 60px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+        }
+
+        .analysis-reveal-btn:hover {
+            background: var(--gold);
+            color: #1a1a1a;
+            box-shadow: 0 8px 35px rgba(212, 175, 55, 0.55);
+            transform: translateY(-2px);
+        }
+
+        .analysis-graph-page {
+            /* full visible graph page */
+        }
+
+        .analysis-detail-page {
+            animation: fadeInUp 0.7s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>VODAFONE INDIA</h1>
+            <p class="subtitle">Strategic Crisis Simulator: Navigate 5 Critical Decisions (2015-2022)</p>
+        </div>
+
+        <!-- Decision 1 (NEW) -->
+        <div class="game-card" id="decision1">
+            <div class="decision-header">Decision 1: Preparing for Market Disruption (2015)</div>
+
+            <div class="critical-notice">&#9888;&#65039; This decision will shape the next 5&#8211;10 years of the company. &#9888;&#65039;</div>
+
+            <div class="question-section">
+                <div class="question-text">How should Vodafone prepare for upcoming competition and disruption in the Indian telecom market?</div>
+            </div>
+
+            <div class="company-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Cash Reserves</div>
+                    <div class="stat-value">&#8377;18,000 Cr</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-green" style="width: 75%"></div>
+                    </div>
+                    <div class="stat-percentage">Healthy level</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Debt</div>
+                    <div class="stat-value">&#8377;35,000 Cr</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-amber" style="width: 58%"></div>
+                    </div>
+                    <div class="stat-percentage">Manageable but significant</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Market Share</div>
+                    <div class="stat-value">23%</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-green" style="width: 76.7%"></div>
+                    </div>
+                    <div class="stat-percentage">2nd largest operator</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Stability</div>
+                    <div class="stat-value">High</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-green" style="width: 85%"></div>
+                    </div>
+                    <div class="stat-percentage">Pre-disruption comfort zone</div>
+                </div>
+            </div>
+
+            <div class="options-container">
+                <div class="option-card" onclick="selectOption(1, 'A')">
+                    <div class="option-title">
+                        <span class="option-letter">A</span>
+                        Continue current strategy without major changes
+                    </div>
+                    <div class="option-description">
+                        Rely on strong brand and stable revenues, assuming competition will remain rational and manageable, while avoiding heavy investments or organizational changes.
+                    </div>
+                    <div class="impact-grid">
+                        <div class="impact-item">
+                            <span class="impact-label">Cash Outflow:</span> &#8377;2,000 Cr
+                        </div>
+                        <div class="impact-item">
+                            <span class="impact-label">Short-term:</span> Profits stable
+                        </div>
+                        <div class="impact-item">
+                            <span class="impact-label">Long-term:</span> Unprepared for shock
+                        </div>
+                    </div>
+                </div>
+
+                <div class="option-card" onclick="selectOption(1, 'B')">
+                    <div class="option-title">
+                        <span class="option-letter">B</span>
+                        Invest heavily in network and cost efficiency
+                    </div>
+                    <div class="option-description">
+                        Upgrade infrastructure and optimize operations early to withstand future pricing pressure, even though it requires large upfront spending from reserves.
+                    </div>
+                    <div class="impact-grid">
+                        <div class="impact-item">
+                            <span class="impact-label">Cash Outflow:</span> &#8377;8,000 Cr
+                        </div>
+                        <div class="impact-item">
+                            <span class="impact-label">Short-term:</span> Lower profits
+                        </div>
+                        <div class="impact-item">
+                            <span class="impact-label">Long-term:</span> Stronger resilience
+                        </div>
+                    </div>
+                </div>
+
+                <div class="option-card" onclick="selectOption(1, 'C')">
+                    <div class="option-title">
+                        <span class="option-letter">C</span>
+                        Take loans to expand aggressively
+                    </div>
+                    <div class="option-description">
+                        Borrow funds to expand footprint rapidly, aiming for market dominance before new entrants disrupt pricing structures.
+                    </div>
+                    <div class="impact-grid">
+                        <div class="impact-item">
+                            <span class="impact-label">Cash Outflow:</span> &#8377;4,000 Cr
+                        </div>
+                        <div class="impact-item">
+                            <span class="impact-label">Loan:</span> &#8377;6,000 Cr
+                        </div>
+                        <div class="impact-item">
+                            <span class="impact-label">Short-term:</span> Market share rises
+                        </div>
+                        <div class="impact-item">
+                            <span class="impact-label">Long-term:</span> High debt exposure
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis 1 (NEW) -->
+        <div class="analysis-section" id="analysis1">
+        <div class="analysis-graph-page" id="graphPage1">
+            <div class="analysis-title">Decision Analysis &amp; Market Intelligence</div>
+            <div class="performance-graph-container">
+                <h3 class="graph-title">Your Decision Impact: Company Performance Timeline</h3>
+                <div class="chart-container">
+                    <canvas id="performanceChart1"></canvas>
+                </div>
+            </div>
+
+            <!-- Live Balance Sheet Snapshot -->
+            <div class="balance-sheet-snapshot" id="balanceSheet1">
+                <div class="balance-sheet-header">
+                    <h3 class="balance-sheet-title">
+                        📊 Live Balance Sheet Snapshot
+                    </h3>
+                    <div class="live-indicator">
+                        <div class="live-pulse"></div>
+                        UPDATED
+                    </div>
+                </div>
+
+                <div class="financial-metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">💰 Cash Reserves</span>
+                            <span class="metric-change" id="cashChange1">--</span>
+                        </div>
+                        <div class="metric-value" id="cashValue1">₹--</div>
+                        <div class="metric-subtext" id="cashSubtext1">Available liquidity</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">📉 Total Debt</span>
+                            <span class="metric-change" id="debtChange1">--</span>
+                        </div>
+                        <div class="metric-value" id="debtValue1">₹--</div>
+                        <div class="metric-subtext" id="debtSubtext1">Debt-to-equity ratio</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">👥 Subscribers</span>
+                            <span class="metric-change" id="subsChange1">--</span>
+                        </div>
+                        <div class="metric-value" id="subsValue1">--M</div>
+                        <div class="metric-subtext" id="subsSubtext1">Active user base</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label-wrapper">
+                                <span class="metric-label">📱 ARPU</span>
+                                <span class="metric-description">Average Revenue Per User</span>
+                            </div>
+                            <span class="metric-change" id="arpuChange1">--</span>
+                        </div>
+                        <div class="metric-value" id="arpuValue1">₹--</div>
+                        <div class="metric-subtext" id="arpuSubtext1">Avg revenue per user/month</div>
+                    </div>
+                </div>
+
+                <div class="credit-rating-display">
+                    <div class="rating-badge" id="ratingBadge1">--</div>
+                    <div class="rating-info">
+                        <div class="rating-title">Credit Rating</div>
+                        <div class="rating-description" id="ratingDescription1">Calculating financial health...</div>
+                    </div>
+                </div>
+
+                <div class="impact-alert" id="impactAlert1" style="display:none;">
+                    <strong>⚠️ Financial Impact:</strong> <span id="impactText1"></span>
+                </div>
+            </div>
+
+            <button class="analysis-reveal-btn" onclick="showAnalysisPage(1)">Analysis</button>
+        </div>
+
+        <div class="analysis-detail-page" id="detailPage1" style="display:none;">
+            <div class="data-point">
+                <h4>&#127919; What Actually Happened</h4>
+                <p>Vodafone chose <strong>Option A</strong> &#8212; continuing its existing strategy with minimal structural change. Management believed Jio&#39;s entry would follow traditional competitive patterns and that the market would self-correct. This complacency proved catastrophic when Jio launched free services in September 2016 and obliterated industry pricing overnight.</p>
+            </div>
+            <div class="data-point">
+                <h4>&#128176; The Cost of Inaction</h4>
+                <div class="chart-container">
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar-label">Cost Structure Gap</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 85%;">7x higher vs Jio</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Network Readiness</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 45%;">45% 4G coverage</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Efficiency vs Peers</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 62%;">62% of Airtel level</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>By staying complacent in 2015, Vodafone entered the price war with a cost per GB of <strong>&#8377;0.85</strong> vs Jio&#39;s <strong>&#8377;0.12</strong> &#8212; a 7x disadvantage. No amount of price matching could bridge this structural gap. Every rupee of revenue lost to Jio came with no equivalent reduction in Vodafone&#39;s operating costs.</p>
+            </div>
+            <div class="data-point">
+                <h4>&#128269; What Option B Would Have Achieved</h4>
+                <p><strong>Network Cost Reduction:</strong> Aggressive 4G upgrades and tower sharing deals in 2015&#8211;16 could have cut cost per GB from &#8377;0.85 to &#8377;0.45 by 2017 &#8212; still higher than Jio, but survivable.<br><br>
+                <strong>Operational Efficiency:</strong> Back-office consolidation and AI-based network management could have reduced OPEX by &#8377;3,500&#8211;4,000 crore annually.<br><br>
+                <strong>Resilience Buffer:</strong> A lower cost base would have allowed Vodafone to reduce prices without EBITDA margins collapsing from 38% to 12%. The company would have had 18&#8211;24 more months of cash runway going into merger talks.</p>
+            </div>
+            <div class="data-point">
+                <h4>&#127922; Why Option C Was a Trap</h4>
+                <p>Expanding aggressively via debt in 2015 would have raised total borrowings above &#8377;41,000 crore before Jio&#39;s launch &#8212; leaving zero financial flexibility to respond to the price war. When revenues fell 30%+ post-Jio, debt servicing alone would have triggered insolvency by early 2018, two years ahead of schedule.<br><br>
+                <span class="outcome-negative">Lesson: Debt-fuelled expansion into a pre-disruption market adds risk, not value.</span></p>
+            </div>
+            <div class="key-learnings">
+                <h3>&#127891; Key Strategic Learnings</h3>
+                <ul>
+                    <li><span class="learning-category">Strategic Learning</span><br><strong>Prepare before the storm, not during it:</strong> Vodafone had 12&#8211;18 months of warning before Jio&#39;s launch. Cost restructuring done pre-disruption costs half as much and takes effect before damage accumulates.</li>
+                    <li><span class="learning-category">Financial Learning</span><br><strong>Resilience requires upfront investment:</strong> The &#8377;8,000 crore Option B investment would have saved an estimated &#8377;25,000+ crore in eventual losses by improving the company&#39;s structural cost position.</li>
+                    <li><span class="learning-category">Leadership Learning</span><br><strong>Complacency in market leadership is fatal:</strong> Assuming competition will remain &#34;rational&#34; ignored Jio&#39;s mission to disrupt &#8212; not profit. Reliance had &#8377;1.5 lakh crore committed to reshaping the market.</li>
+                    <li><strong>Technology debt compounds in disruption:</strong> Vodafone&#39;s 2G/3G legacy network was a sunk-cost trap. Accelerating 4G migration in 2015 would have closed the cost gap before it became existential.</li>
+                    <li><strong>Incremental thinking fails against exponential shocks:</strong> Vodafone modelled Jio as a normal competitor. Jio was a market-restructuring event. The frameworks used to analyse it were wrong from the start.</li>
+                </ul>
+            </div>
+            <button class="next-button" onclick="showDecision(2)">Next Scenario &#8594;</button>
+        </div>
+        </div>
+
+        <!-- Decision 2 (formerly labelled Decision 1 in original) -->
+        <div class="game-card hidden" id="decision2">
+            <div class="decision-header">Decision 2: Responding to Jio's Price War (2016)</div>
+            
+            <div class="critical-notice">⚠️ This decision will decide the next 5-10 years of the company. ⚠️</div>
+            <div class="question-section">
+                <div class="question-text">How should Vodafone prepare for upcoming competition and disruption in the Indian telecom market?</div>
+            </div>
+
+                                    <div class="company-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Cash Reserves</div>
+                    <div class="stat-value">₹8,500 crore</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-amber" style="width: 56.7%"></div>
+                    </div>
+                    <div class="stat-percentage">56.7% of optimal level</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Debt</div>
+                    <div class="stat-value">₹12,000 crore</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-amber" style="width: 40%"></div>
+                    </div>
+                    <div class="stat-percentage">Moderate risk level</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Market Share</div>
+                    <div class="stat-value">23.2%</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-green" style="width: 77.3%"></div>
+                    </div>
+                    <div class="stat-percentage">2nd largest operator</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Quarterly Revenue</div>
+                    <div class="stat-value">₹11,500 crore</div>
+                </div>
+            </div>
+
+                        
+                
+                <div class="options-container">
+                    <div class="option-card" onclick="selectOption(2, 'A')">
+                        <div class="option-title">
+                            <span class="option-letter">A</span>
+                            Match Jio's pricing
+                        </div>
+                        <div class="option-description">
+                            Slash tariffs aggressively to retain customers, accepting heavy losses while hoping the price war will end quickly.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Loss:</span> ₹6,000 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Churn slows
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Severe financial stress
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-card" onclick="selectOption(2, 'B')">
+                        <div class="option-title">
+                            <span class="option-letter">B</span>
+                            Focus on service quality and premium users
+                        </div>
+                        <div class="option-description">
+                            Maintain pricing discipline and invest in network quality, targeting high-value customers while allowing low-margin users to leave.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Outflow:</span> ₹3,500 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Market share declines
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Better margins
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-card" onclick="selectOption(2, 'C')">
+                        <div class="option-title">
+                            <span class="option-letter">C</span>
+                            Exit loss-making circles
+                        </div>
+                        <div class="option-description">
+                            Close unprofitable regions to stop cash bleed, even if it reduces nationwide presence and customer base.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Loss:</span> ₹2,000 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Negative perception
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Improved survival
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis 2 -->
+        <div class="analysis-section" id="analysis2">
+        <div class="analysis-graph-page" id="graphPage2">
+            <div class="analysis-title">Decision Analysis & Market Intelligence</div>
+            <div class="performance-graph-container">
+                <h3 class="graph-title">Your Decision Impact: Company Performance Timeline</h3>
+                <div class="chart-container">
+                    <canvas id="performanceChart2"></canvas>
+                </div>
+            </div>
+
+            <!-- Live Balance Sheet Snapshot -->
+            <div class="balance-sheet-snapshot" id="balanceSheet2">
+                <div class="balance-sheet-header">
+                    <h3 class="balance-sheet-title">
+                        📊 Live Balance Sheet Snapshot
+                    </h3>
+                    <div class="live-indicator">
+                        <div class="live-pulse"></div>
+                        UPDATED
+                    </div>
+                </div>
+
+                <div class="financial-metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">💰 Cash Reserves</span>
+                            <span class="metric-change" id="cashChange2">--</span>
+                        </div>
+                        <div class="metric-value" id="cashValue2">₹--</div>
+                        <div class="metric-subtext" id="cashSubtext2">Available liquidity</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">📉 Total Debt</span>
+                            <span class="metric-change" id="debtChange2">--</span>
+                        </div>
+                        <div class="metric-value" id="debtValue2">₹--</div>
+                        <div class="metric-subtext" id="debtSubtext2">Debt-to-equity ratio</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">👥 Subscribers</span>
+                            <span class="metric-change" id="subsChange2">--</span>
+                        </div>
+                        <div class="metric-value" id="subsValue2">--M</div>
+                        <div class="metric-subtext" id="subsSubtext2">Active user base</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label-wrapper">
+                                <span class="metric-label">📱 ARPU</span>
+                                <span class="metric-description">Average Revenue Per User</span>
+                            </div>
+                            <span class="metric-change" id="arpuChange2">--</span>
+                        </div>
+                        <div class="metric-value" id="arpuValue2">₹--</div>
+                        <div class="metric-subtext" id="arpuSubtext2">Avg revenue per user/month</div>
+                    </div>
+                </div>
+
+                <div class="credit-rating-display">
+                    <div class="rating-badge" id="ratingBadge2">--</div>
+                    <div class="rating-info">
+                        <div class="rating-title">Credit Rating</div>
+                        <div class="rating-description" id="ratingDescription2">Calculating financial health...</div>
+                    </div>
+                </div>
+
+                <div class="impact-alert" id="impactAlert2" style="display:none;">
+                    <strong>⚠️ Financial Impact:</strong> <span id="impactText2"></span>
+                </div>
+            </div>
+
+            <button class="analysis-reveal-btn" onclick="showAnalysisPage(2)">Analysis</button>
+        </div>
+
+        <div class="analysis-detail-page" id="detailPage2" style="display:none;">
+            <div class="data-point">
+                <h4>📊 Market Shock Metrics (September 2016)</h4>
+                <p>Jio launched with <strong>free voice forever</strong> and data at ₹50/GB versus industry average of ₹300/GB - an <strong>83% price reduction</strong>. Within 6 months, Jio acquired 100 million subscribers, the fastest telecom subscriber acquisition globally. Industry ARPU collapsed from ₹196 to ₹104 within 18 months.</p>
+            </div>
+            <div class="data-point">
+                <h4>🎯 What Actually Happened</h4>
+                <p>Vodafone chose <strong>Option A</strong> - matching Jio's pricing across most segments. The company launched unlimited calling and slashed data prices by 60-70%. This decision was driven by panic over subscriber losses which hit <strong>5 million per month</strong> in Q1 2017.</p>
+            </div>
+            <div class="data-point">
+                <h4>💰 Financial Hemorrhage Analysis</h4>
+                <div class="chart-container">
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar-label">Revenue Decline</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 88%;">-88% margin</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">EBITDA Impact</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 65%;">-65%</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Cash Burn Rate</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 95%;">₹1,500 Cr/month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>Vodafone's quarterly revenue dropped from ₹11,500 crore (Q3 2016) to ₹7,800 crore (Q4 2017) - a <strong>₹3,700 crore quarterly revenue loss</strong>. EBITDA margins crashed from 38% to 12% in same period. Monthly cash burn reached ₹1,500 crore at peak.</p>
+            </div>
+            <div class="data-point">
+                <h4>🔍 Competitor Strategy Comparison</h4>
+                <p><strong>Bharti Airtel (Smart Strategy):</strong> Initially maintained premium pricing, lost 15% market share but protected high-value customers. ARPU remained 30% higher than Vodafone. Later selectively matched pricing only in competitive circles.<br><br>
+                <strong>Vodafone (Reactive Strategy):</strong> Blanket price cuts across all 22 circles, including profitable ones. Lost ₹18,000 crore in revenue value while preventing only 40% of subscriber churn.<br><br>
+                <strong>Jio Advantage:</strong> Operating cost of ₹0.12/GB versus Vodafone's ₹0.85/GB due to modern VoLTE network. Could sustain losses backed by ₹1.5 lakh crore Reliance investment.</p>
+            </div>
+            <div class="data-point">
+                <h4>📉 Customer Segmentation Impact</h4>
+                <p>
+                    <span class="outcome-negative">Premium Segment (20% of base, 65% of revenue):</span> Lost 12% to Airtel's quality positioning<br>
+                    <span class="outcome-neutral">Mid-tier Segment (50% of base, 30% of revenue):</span> Retained 70% but at 60% lower ARPU<br>
+                    <span class="outcome-negative">Low-value Segment (30% of base, 5% of revenue):</span> Lost 85% to Jio despite price matching
+                </p>
+            </div>
+            <div class="data-point">
+                <h4>🎲 Alternative Scenario Analysis</h4>
+                <p><strong>If Vodafone had chosen Option B (Premium Strategy):</strong><br>
+                • Market share would decline to 15% (vs actual 17%)<br>
+                • But ARPU would be ₹180 vs actual ₹120<br>
+                • Revenue: ₹8,500 crore vs actual ₹7,800 crore<br>
+                • EBITDA margin: 25% vs actual 12%<br>
+                • Cash position: ₹2,100 crore better over 18 months<br>
+                • Debt servicing: Manageable vs critical stress</p>
+            </div>
+            <div class="key-learnings">
+                <h3>🎓 Key Strategic Learnings</h3>
+                <ul>
+                    <li><span class="learning-category">Strategic Learning</span><br><strong>Price wars favor lowest-cost operators:</strong> Jio's cost per GB was 85% lower due to newer technology. Matching prices while having 7x higher costs guaranteed failure.</li>
+                    <li><span class="learning-category">Financial Learning</span><br><strong>Protecting margins beats defending volume:</strong> Losing 6% more market share while maintaining 13% higher margins would have saved ₹9,000 crore in cash.</li>
+                    <li><span class="learning-category">Leadership Learning</span><br><strong>Customer segmentation is critical in disruption:</strong> Blanket price cuts destroyed value from premium customers who valued quality over price.</li>
+                    <li><strong>Panic-driven decisions compound losses:</strong> The ₹6,000 crore spent matching prices didn't stop subscriber loss but eliminated profit cushion needed for recovery.</li>
+                    <li><strong>Subsidized competition changes game theory:</strong> When competitor has ₹1.5 lakh crore backing and different profit timeline, traditional competitive responses fail.</li>
+                </ul>
+            </div>
+            <button class="next-button" onclick="showDecision(3)">Next Scenario →</button>
+        </div>
+        </div>
+
+        <!-- Decision 3 -->
+        <div class="game-card hidden" id="decision3">
+            <div class="decision-header">Decision 3: Vodafone-Idea Merger (2017)</div>
+            
+            <div class="critical-notice">⚠️ This decision will decide the next 5-10 years of the company. ⚠️</div>
+
+            <div class="question-section">
+                <div class="question-text">Should Vodafone merge with Idea to gain scale despite heavy debt?</div>
+            </div>
+
+                        <div class="company-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Cash Reserves</div>
+                    <div class="stat-value">₹2,800 crore</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-red" style="width: 18.7%"></div>
+                    </div>
+                    <div class="stat-percentage">CRITICAL: Emergency levels</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Debt</div>
+                    <div class="stat-value">₹45,000 crore</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-red" style="width: 100%"></div>
+                    </div>
+                    <div class="stat-percentage">SEVERE: Post-merger combined</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Market Share</div>
+                    <div class="stat-value">32% (combined)</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-green" style="width: 100%"></div>
+                    </div>
+                    <div class="stat-percentage">Largest operator on paper</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Quarterly Revenue</div>
+                    <div class="stat-value">₹15,600 crore</div>
+                </div>
+            </div>
+
+            <div class="question-section">
+                <div class="question-text">Should Vodafone merge with Idea to gain scale despite heavy debt?</div>
+                
+                <div class="options-container">
+                    <div class="option-card" onclick="selectOption(3, 'A')">
+                        <div class="option-title">
+                            <span class="option-letter">A</span>
+                            Merge to become market leader
+                        </div>
+                        <div class="option-description">
+                            Combine operations to dominate market share, assuming economies of scale will reduce costs and improve competitiveness.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Outflow:</span> ₹5,000 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Largest operator
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> High debt + integration complexity
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-card" onclick="selectOption(3, 'B')">
+                        <div class="option-title">
+                            <span class="option-letter">B</span>
+                            Stay independent and cut costs
+                        </div>
+                        <div class="option-description">
+                            Avoid merger risks and focus on internal restructuring, layoffs, and efficiency improvements to stabilize finances.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Loss:</span> ₹3,000 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Employee unrest
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Lower debt, better control
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-card" onclick="selectOption(3, 'C')">
+                        <div class="option-title">
+                            <span class="option-letter">C</span>
+                            Bring in foreign strategic investor
+                        </div>
+                        <div class="option-description">
+                            Raise capital by diluting ownership, gaining financial stability and expertise instead of increasing debt burden.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Inflow:</span> ₹6,000 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Ownership dilution
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Stronger balance sheet
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis 3 -->
+        <div class="analysis-section" id="analysis3">
+        <div class="analysis-graph-page" id="graphPage3">
+            <div class="analysis-title">Decision Analysis & Market Intelligence</div>
+            <div class="performance-graph-container">
+                <h3 class="graph-title">Your Decision Impact: Company Performance Timeline</h3>
+                <div class="chart-container">
+                    <canvas id="performanceChart3"></canvas>
+                </div>
+            </div>
+
+            <!-- Live Balance Sheet Snapshot -->
+            <div class="balance-sheet-snapshot" id="balanceSheet3">
+                <div class="balance-sheet-header">
+                    <h3 class="balance-sheet-title">
+                        📊 Live Balance Sheet Snapshot
+                    </h3>
+                    <div class="live-indicator">
+                        <div class="live-pulse"></div>
+                        UPDATED
+                    </div>
+                </div>
+
+                <div class="financial-metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">💰 Cash Reserves</span>
+                            <span class="metric-change" id="cashChange3">--</span>
+                        </div>
+                        <div class="metric-value" id="cashValue3">₹--</div>
+                        <div class="metric-subtext" id="cashSubtext3">Available liquidity</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">📉 Total Debt</span>
+                            <span class="metric-change" id="debtChange3">--</span>
+                        </div>
+                        <div class="metric-value" id="debtValue3">₹--</div>
+                        <div class="metric-subtext" id="debtSubtext3">Debt-to-equity ratio</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">👥 Subscribers</span>
+                            <span class="metric-change" id="subsChange3">--</span>
+                        </div>
+                        <div class="metric-value" id="subsValue3">--M</div>
+                        <div class="metric-subtext" id="subsSubtext3">Active user base</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label-wrapper">
+                                <span class="metric-label">📱 ARPU</span>
+                                <span class="metric-description">Average Revenue Per User</span>
+                            </div>
+                            <span class="metric-change" id="arpuChange3">--</span>
+                        </div>
+                        <div class="metric-value" id="arpuValue3">₹--</div>
+                        <div class="metric-subtext" id="arpuSubtext3">Avg revenue per user/month</div>
+                    </div>
+                </div>
+
+                <div class="credit-rating-display">
+                    <div class="rating-badge" id="ratingBadge3">--</div>
+                    <div class="rating-info">
+                        <div class="rating-title">Credit Rating</div>
+                        <div class="rating-description" id="ratingDescription3">Calculating financial health...</div>
+                    </div>
+                </div>
+
+                <div class="impact-alert" id="impactAlert3" style="display:none;">
+                    <strong>⚠️ Financial Impact:</strong> <span id="impactText3"></span>
+                </div>
+            </div>
+
+            <button class="analysis-reveal-btn" onclick="showAnalysisPage(3)">Analysis</button>
+        </div>
+
+        <div class="analysis-detail-page" id="detailPage3" style="display:none;">
+            <div class="data-point">
+                <h4>📊 Merger Fundamentals (March 2017)</h4>
+                <p>Vodafone (21% market share, 218 million subscribers, ₹45,000 crore debt) + Idea (18% market share, 195 million subscribers, ₹65,000 crore debt) = VodafoneIdea (35% market share, 413 million subscribers, <strong>₹1.1 lakh crore combined debt</strong>). Debt-to-EBITDA ratio: <strong>7.2x</strong> versus healthy telecom benchmark of 3.0x.</p>
+            </div>
+            <div class="data-point">
+                <h4>🎯 What Actually Happened</h4>
+                <p>Companies chose <strong>Option A</strong> - the merger. Rationale was achieving scale economies and negotiating power. However, the merger created the world's largest telecom operator with the <strong>worst balance sheet</strong> in the industry. Integration took 2+ years during which market continued deteriorating.</p>
+            </div>
+            <div class="data-point">
+                <h4>💰 Merger Cost Reality vs Projections</h4>
+                <div class="chart-container">
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar-label">Projected Synergies</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 70%;">₹14,000 Cr</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Actual Synergies</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 30%;">₹6,000 Cr</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Integration Costs</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 85%;">₹17,000 Cr</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p><strong>Promised synergies:</strong> ₹14,000 crore annual savings from network consolidation, vendor negotiations, and overhead reduction.<br>
+                <strong>Actual synergies (by 2020):</strong> Only ₹6,000 crore achieved due to duplicate infrastructure in different spectrum bands, incompatible systems, and regulatory restrictions.<br>
+                <strong>Hidden costs:</strong> ₹17,000 crore in tower sale losses, subscriber churn during migration, rebranding, and spectrum harmonization fees.</p>
+            </div>
+            <div class="data-point">
+                <h4>🔍 Integration Hell: The Reality</h4>
+                <p><strong>Network Complexity:</strong> Vodafone used Ericsson/Nokia, Idea used Huawei/ZTE. Merging networks required ₹8,000 crore additional investment. Different spectrum holdings in same circles meant running parallel networks for 18+ months.<br><br>
+                <strong>Subscriber Chaos:</strong> 28 million subscribers lost during integration (2017-2019) due to poor service during network mergers. Churn rate spiked to 7% monthly vs industry 3%.<br><br>
+                <strong>Employee Attrition:</strong> 15,000 employees left during integration including 40% of senior management. Knowledge loss and execution delays compounded problems.<br><br>
+                <strong>Brand Confusion:</strong> Operating as Vodafone-Idea, then Vi, while maintaining separate brands in some circles created customer confusion and marketing inefficiency.</p>
+            </div>
+            <div class="data-point">
+                <h4>📉 Market Reality During Integration</h4>
+                <p>
+                    <span class="outcome-negative">2017-2018:</span> While merging, Jio gained 100 million subscribers, Airtel stabilized at 28% share<br>
+                    <span class="outcome-negative">2018-2019:</span> ARPU declined further to ₹104, VodafoneIdea's fell to ₹89 due to subscriber mix deterioration<br>
+                    <span class="outcome-negative">2019:</span> Market share dropped from 35% to 28% - lost 7% despite being largest operator<br>
+                    <span class="outcome-negative">Debt servicing:</span> Interest costs of ₹12,000 crore annually consumed 85% of EBITDA
+                </p>
+            </div>
+            <div class="data-point">
+                <h4>🎲 Alternative Scenario: Strategic Investor (Option C)</h4>
+                <p><strong>If Vodafone had chosen Option C instead:</strong><br>
+                • Amazon was reportedly interested in 20% stake for ₹15,000 crore investment<br>
+                • Would have brought: (a) ₹15,000 crore cash infusion, (b) Cloud infrastructure expertise, (c) Potential bundling with Prime subscriptions, (d) Technology partnership for 5G<br>
+                • Debt would remain at ₹45,000 crore vs merged ₹1.1 lakh crore<br>
+                • Could have maintained agility and avoided 2-year integration distraction<br>
+                • Ownership dilution: 20% vs eventually 95% loss of value in actual merger path</p>
+            </div>
+            <div class="data-point">
+                <h4>💡 Industry Precedent: Sprint-T-Mobile vs Vodafone-Idea</h4>
+                <p><strong>Sprint-T-Mobile (2020 merger):</strong> T-Mobile was stronger party with positive cash flow, Sprint was struggling. T-Mobile management took control. Combined debt was 4.5x EBITDA. Synergies achieved in 18 months.<br><br>
+                <strong>Vodafone-Idea (2017 merger):</strong> Both parties equally weak with negative cash flow. No clear management control initially. Combined debt was 7.2x EBITDA. Synergies still incomplete after 3 years.<br><br>
+                <strong>Lesson:</strong> Merging two drowning companies doesn't create a swimmer - it creates a bigger anchor.</p>
+            </div>
+            <div class="key-learnings">
+                <h3>🎓 Key Strategic Learnings</h3>
+                <ul>
+                    <li><span class="learning-category">Strategic Learning</span><br><li><strong>Scale without profitability increases systemic risk:</strong> Being the largest operator is meaningless when losing ₹2,000 crore quarterly. Size magnifies problems, not solves them.</li>
+                    <li><span class="learning-category">Strategic Learning</span><br><strong>Mergers under pressure magnify execution challenges:</strong> Integration requires management focus, capital, and time - all scarce resources during crisis. Normal merger success rate is 50%; during crisis it drops to 20%.</li>
+                    <li><span class="learning-category">Financial Learning</span><br><strong>Debt-to-EBITDA above 6x is existential risk:</strong> At 7.2x ratio, even small EBITDA decline triggers debt spiral. Interest costs consume all cash generation.</li>
+                    <li><span class="learning-category">Financial Learning</span><br><strong>Equity dilution can be safer than debt accumulation:</strong> Giving up 20% ownership to gain ₹15,000 crore preserves future options. Taking ₹1.1 lakh crore debt eliminates all options.</li>
+                    <li><span class="learning-category">Leadership Learning</span><br><strong>Integration complexity is underestimated in telco mergers:</strong> Different technologies, spectrum bands, billing systems, and cultures require 3-5 years for full integration - but markets don't wait.</li>
+                    <li><span class="learning-category">Strategic Learning</span><br><strong>Market share during disruption is vanity metric:</strong> VodafoneIdea was largest operator while hemorrhaging cash. Airtel at #2 was profitable. Rank matters less than unit economics.</li>
+                </ul>
+            </div>
+            <button class="next-button" onclick="showDecision(4)">Next Scenario →</button>
+        </div>
+        </div>
+
+        <!-- Decision 4 -->
+        <div class="game-card hidden" id="decision4">
+            <div class="decision-header">Decision 4: AGR Dues Crisis (2019)</div>
+            
+            <div class="critical-notice">⚠️ This decision will decide the next 5-10 years of the company. ⚠️</div>
+
+            <div class="question-section">
+                <div class="question-text">How should Vodafone respond to massive AGR dues imposed by the government?</div>
+            </div>
+
+                        <div class="company-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Cash Reserves</div>
+                    <div class="stat-value">₹1,200 crore</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-red" style="width: 8%"></div>
+                    </div>
+                    <div class="stat-percentage">TERMINAL: Weeks of runway</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">AGR Liability</div>
+                    <div class="stat-value">₹58,000 crore</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-red" style="width: 100%"></div>
+                    </div>
+                    <div class="stat-percentage">CATASTROPHIC: Unpayable</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Market Share</div>
+                    <div class="stat-value">23.1%</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-amber" style="width: 77%"></div>
+                    </div>
+                    <div class="stat-percentage">Bleeding subscribers daily</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Quarterly Revenue</div>
+                    <div class="stat-value">₹10,800 crore</div>
+                </div>
+            </div>
+
+            <div class="question-section">
+                <div class="question-text">How should Vodafone respond to massive AGR dues imposed by the government?</div>
+                
+                <div class="options-container">
+                    <div class="option-card" onclick="selectOption(4, 'A')">
+                        <div class="option-title">
+                            <span class="option-letter">A</span>
+                            Raise debt to pay dues
+                        </div>
+                        <div class="option-description">
+                            Borrow heavily to clear dues immediately and avoid legal risk.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Loan:</span> ₹40,000 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Legal certainty
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Unsustainable interest burden
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-card" onclick="selectOption(4, 'B')">
+                        <div class="option-title">
+                            <span class="option-letter">B</span>
+                            Seek government relief
+                        </div>
+                        <div class="option-description">
+                            Negotiate extended timelines and policy support while continuing limited operations.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Outflow:</span> ₹1,500 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Temporary survival
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Continued uncertainty
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-card" onclick="selectOption(4, 'C')">
+                        <div class="option-title">
+                            <span class="option-letter">C</span>
+                            Begin controlled exit
+                        </div>
+                        <div class="option-description">
+                            Start exiting Indian market to cap losses and avoid future liabilities.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Loss:</span> ₹4,000 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Brand damage
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Capital preservation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis 4 -->
+        <div class="analysis-section" id="analysis4">
+        <div class="analysis-graph-page" id="graphPage4">
+            <div class="analysis-title">Decision Analysis & Market Intelligence</div>
+            <div class="performance-graph-container">
+                <h3 class="graph-title">Your Decision Impact: Company Performance Timeline</h3>
+                <div class="chart-container">
+                    <canvas id="performanceChart4"></canvas>
+                </div>
+            </div>
+
+            <!-- Live Balance Sheet Snapshot -->
+            <div class="balance-sheet-snapshot" id="balanceSheet4">
+                <div class="balance-sheet-header">
+                    <h3 class="balance-sheet-title">
+                        📊 Live Balance Sheet Snapshot
+                    </h3>
+                    <div class="live-indicator">
+                        <div class="live-pulse"></div>
+                        UPDATED
+                    </div>
+                </div>
+
+                <div class="financial-metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">💰 Cash Reserves</span>
+                            <span class="metric-change" id="cashChange4">--</span>
+                        </div>
+                        <div class="metric-value" id="cashValue4">₹--</div>
+                        <div class="metric-subtext" id="cashSubtext4">Available liquidity</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">📉 Total Debt</span>
+                            <span class="metric-change" id="debtChange4">--</span>
+                        </div>
+                        <div class="metric-value" id="debtValue4">₹--</div>
+                        <div class="metric-subtext" id="debtSubtext4">Debt-to-equity ratio</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">👥 Subscribers</span>
+                            <span class="metric-change" id="subsChange4">--</span>
+                        </div>
+                        <div class="metric-value" id="subsValue4">--M</div>
+                        <div class="metric-subtext" id="subsSubtext4">Active user base</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label-wrapper">
+                                <span class="metric-label">📱 ARPU</span>
+                                <span class="metric-description">Average Revenue Per User</span>
+                            </div>
+                            <span class="metric-change" id="arpuChange4">--</span>
+                        </div>
+                        <div class="metric-value" id="arpuValue4">₹--</div>
+                        <div class="metric-subtext" id="arpuSubtext4">Avg revenue per user/month</div>
+                    </div>
+                </div>
+
+                <div class="credit-rating-display">
+                    <div class="rating-badge" id="ratingBadge4">--</div>
+                    <div class="rating-info">
+                        <div class="rating-title">Credit Rating</div>
+                        <div class="rating-description" id="ratingDescription4">Calculating financial health...</div>
+                    </div>
+                </div>
+
+                <div class="impact-alert" id="impactAlert4" style="display:none;">
+                    <strong>⚠️ Financial Impact:</strong> <span id="impactText4"></span>
+                </div>
+            </div>
+
+            <button class="analysis-reveal-btn" onclick="showAnalysisPage(4)">Analysis</button>
+        </div>
+
+        <div class="analysis-detail-page" id="detailPage4" style="display:none;">
+            <div class="data-point">
+                <h4>📊 The AGR Bombshell (October 2019)</h4>
+                <p>Supreme Court ruled telecom operators must pay license fees and spectrum charges on <strong>Adjusted Gross Revenue (AGR)</strong> including non-telecom income. VodafoneIdea faced dues of <strong>₹58,254 crore</strong> (including interest and penalties dating back to 2006). Bharti Airtel: ₹43,000 crore. Jio: ₹177 crore (recent entry, minimal liability).</p>
+            </div>
+            <div class="data-point">
+                <h4>🎯 What Actually Happened</h4>
+                <p>VodafoneIdea chose <strong>Option B</strong> - seeking government relief while making token payments. Paid ₹6,854 crore initially, requested 15-year payment moratorium. Government eventually granted 4-year moratorium in 2021, but by then company had lost 100+ million subscribers and investor confidence was destroyed.</p>
+            </div>
+            <div class="data-point">
+                <h4>💰 Financial Death Spiral Analysis</h4>
+                <div class="chart-container">
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar-label">AGR Dues</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 100%;">₹58,254 Cr</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Existing Debt</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 70%;">₹1,25,000 Cr</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Annual EBITDA</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 25%;">₹14,500 Cr</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Annual Interest Cost</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 22%;">₹13,000 Cr</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p><strong>Debt mathematics of doom:</strong><br>
+                • Total liabilities: ₹1,83,254 crore (debt + AGR)<br>
+                • Debt-to-EBITDA: <strong>12.6x</strong> (versus bankruptcy threshold of 8x)<br>
+                • Interest coverage ratio: <strong>1.1x</strong> (below 2x is distress signal)<br>
+                • Free cash flow: <strong>Negative ₹8,000 crore annually</strong><br>
+                • Even with moratorium, debt servicing consumed 90% of EBITDA leaving zero for network investment</p>
+            </div>
+            <div class="data-point">
+                <h4>🔍 Market Response & Credibility Collapse</h4>
+                <p><strong>Investor Panic:</strong> VodafoneIdea stock crashed from ₹5 (pre-AGR) to ₹3 (immediate) to ₹0.50 (2020). Market cap evaporated from ₹75,000 crore to ₹3,000 crore - <strong>96% value destruction</strong>.<br><br>
+                <strong>Vendor Crisis:</strong> Equipment vendors demanded advance payments. Nokia and Ericsson suspended deliveries. Network expansion frozen for 18 months.<br><br>
+                <strong>Customer Flight:</strong> Enterprise customers (20% of revenue) migrated to Airtel citing bankruptcy risk. Premium users followed. Subscriber base declined from 320 million to 255 million in 12 months - <strong>losing 5 million monthly</strong>.<br><br>
+                <strong>Employee Exodus:</strong> 8,000 employees left including 60% of technical specialists. Quality deteriorated creating negative spiral.</p>
+            </div>
+            <div class="data-point">
+                <h4>📉 Comparison: Airtel's Survival vs Vi's Struggle</h4>
+                <p>
+                    <span class="outcome-positive">Airtel Strategy:</span> Paid ₹18,000 crore immediately, negotiated 10-year payment plan for balance. Raised ₹32,000 crore via rights issue and QIP. Maintained vendor relationships and network quality.<br><br>
+                    <span class="outcome-negative">VodafoneIdea Strategy:</span> Paid minimum ₹6,854 crore, sought maximum relief. Failed to raise capital (Vodafone Plc and Aditya Birla Group refused further investment). Network deteriorated accelerating subscriber loss.<br><br>
+                    <strong>Outcome Gap:</strong> By 2021, Airtel ARPU: ₹178, Vi ARPU: ₹115. Airtel subscriber growth positive, Vi declining 3% quarterly. Airtel profitable, Vi losing ₹7,000 crore quarterly.
+                </p>
+            </div>
+            <div class="data-point">
+                <h4>🎲 Alternative Scenario: Immediate Exit (Option C)</h4>
+                <p><strong>If VodafoneIdea had chosen controlled exit in 2019:</strong><br>
+                • Could have sold spectrum to Airtel/Jio for ₹35,000-40,000 crore<br>
+                • Tower assets worth ₹25,000 crore<br>
+                • Customer base sale: ₹15,000 crore<br>
+                • Total asset value: ₹75,000-80,000 crore<br>
+                • After paying AGR dues (₹58,254 crore), could have recovered ₹17,000-22,000 crore<br>
+                • Versus actual outcome: Company value near zero by 2022, promoters lost everything, AGR still unpaid<br><br>
+                <strong>Exit timing matters:</strong> 2019 exit would have preserved ₹20,000 crore. By 2022, exit value was negative (liabilities exceeded assets).</p>
+            </div>
+            <div class="data-point">
+                <h4>⚖️ Regulatory Reality Check</h4>
+                <p><strong>Government Relief Expectations vs Reality:</strong><br>
+                Politicians hinted at relief but Supreme Court upheld full dues. Government eventually gave moratorium but required converting dues to equity, diluting promoters to 3% stake. Relief came too late - after irreversible damage.<br><br>
+                <strong>Lesson:</strong> Banking on regulatory relief when court has ruled is hope, not strategy. Bharti Airtel assumed relief would come but prepared for worst case. VodafoneIdea assumed relief would come and did nothing else.</p>
+            </div>
+            <div class="key-learnings">
+                <h3>🎓 Key Strategic Learnings</h3>
+                <ul>
+                    <li><span class="learning-category">Strategic Learning</span><br><strong>Regulatory shocks can destroy businesses overnight:</strong> A single court ruling wiped out 96% of market value. Businesses in regulated industries must stress-test for worst-case regulatory scenarios.</li>
+                    <li><span class="learning-category">Financial Learning</span><br><strong>Debt-funded compliance worsens insolvency risks:</strong> Adding ₹40,000 crore debt to ₹1.25 lakh crore would have pushed debt-to-EBITDA to 14x - mathematically impossible to service even with revenue growth.</li>
+                    <li><span class="learning-category">Financial Learning</span><br><strong>Market values certainty over everything:</strong> Airtel's stock rose 15% after immediate payment announcement despite cash outflow. Vi's stock crashed 40% seeking relief. Markets punish uncertainty more than bad news.</li>
+                    <li><span class="learning-category">Leadership Learning</span><br><strong>Hope-based strategies delay recovery:</strong> Waiting for government relief wasted 18 critical months during which subscriber base collapsed by 65 million users worth ₹18,000 crore in enterprise value.</li>
+                    <li><span class="learning-category">Strategic Learning</span><br><strong>Exit timing is everything in terminal situations:</strong> 2019 exit would have recovered ₹20,000 crore. 2020 exit: ₹8,000 crore. 2021 exit: breakeven. 2022: negative value. Each quarter of delay destroyed ₹3,000 crore of value.</li>
+                    <li><span class="learning-category">Leadership Learning</span><br><strong>Credibility once lost is unrecoverable:</strong> After AGR crisis, even massive government relief (moratorium, spectrum payment extension) couldn't restore confidence. Customers, vendors, investors had moved on.</li>
+                </ul>
+            </div>
+            <button class="next-button" onclick="showDecision(5)">Continue to Final Decision →</button>
+        </div>
+        </div>
+
+        <!-- Decision 5 -->
+        <div class="game-card hidden" id="decision5">
+            <div class="decision-header">Decision 5: Exit vs Survival Bet (2020-2022)</div>
+            
+            <div class="critical-notice">⚠️ This decision will decide the next 5-10 years of the company. ⚠️</div>
+
+            <div class="question-section">
+                <div class="question-text">Should Vodafone continue operating in India or exit?</div>
+            </div>
+
+                        <div class="company-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Cash Reserves</div>
+                    <div class="stat-value">₹300 crore</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-red" style="width: 2%"></div>
+                    </div>
+                    <div class="stat-percentage">DEATH SPIRAL: Days remaining</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Outstanding</div>
+                    <div class="stat-value">₹1,95,000 crore</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-red" style="width: 100%"></div>
+                    </div>
+                    <div class="stat-percentage">Beyond salvageable</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Market Share</div>
+                    <div class="stat-value">18.2%</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill indicator-red" style="width: 60.7%"></div>
+                    </div>
+                    <div class="stat-percentage">Free-falling, lost 5% in 1 year</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Quarterly Revenue</div>
+                    <div class="stat-value">₹9,200 crore</div>
+                </div>
+            </div>
+
+            <div class="question-section">
+                <div class="question-text">Should Vodafone continue operating in India or exit?</div>
+                
+                <div class="options-container">
+                    <div class="option-card" onclick="selectOption(5, 'A')">
+                        <div class="option-title">
+                            <span class="option-letter">A</span>
+                            Exit market completely
+                        </div>
+                        <div class="option-description">
+                            Shut down operations to stop losses, prioritizing global financial health over local presence.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Loss:</span> ₹3,000 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Reputation hit
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Capital protected globally
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-card" onclick="selectOption(5, 'B')">
+                        <div class="option-title">
+                            <span class="option-letter">B</span>
+                            Continue with government support
+                        </div>
+                        <div class="option-description">
+                            Accept equity dilution and government involvement, betting on tariff hikes and market recovery.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Outflow:</span> ₹2,500 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Survival achieved
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Uncertain revival
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-card" onclick="selectOption(5, 'C')">
+                        <div class="option-title">
+                            <span class="option-letter">C</span>
+                            Sell stake to domestic investor
+                        </div>
+                        <div class="option-description">
+                            Transfer partial ownership to reduce debt and bring new leadership.
+                        </div>
+                        <div class="impact-grid">
+                            <div class="impact-item">
+                                <span class="impact-label">Cash Inflow:</span> ₹5,000 Cr
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Short-term:</span> Control reduced
+                            </div>
+                            <div class="impact-item">
+                                <span class="impact-label">Long-term:</span> Turnaround chance
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis 5 -->
+        <div class="analysis-section" id="analysis5">
+        <div class="analysis-graph-page" id="graphPage5">
+            <div class="analysis-title">Decision Analysis & Market Intelligence</div>
+            <div class="performance-graph-container">
+                <h3 class="graph-title">Your Decision Impact: Company Performance Timeline</h3>
+                <div class="chart-container">
+                    <canvas id="performanceChart5"></canvas>
+                </div>
+            </div>
+
+            <!-- Live Balance Sheet Snapshot -->
+            <div class="balance-sheet-snapshot" id="balanceSheet5">
+                <div class="balance-sheet-header">
+                    <h3 class="balance-sheet-title">
+                        📊 Live Balance Sheet Snapshot
+                    </h3>
+                    <div class="live-indicator">
+                        <div class="live-pulse"></div>
+                        UPDATED
+                    </div>
+                </div>
+
+                <div class="financial-metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">💰 Cash Reserves</span>
+                            <span class="metric-change" id="cashChange5">--</span>
+                        </div>
+                        <div class="metric-value" id="cashValue5">₹--</div>
+                        <div class="metric-subtext" id="cashSubtext5">Available liquidity</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">📉 Total Debt</span>
+                            <span class="metric-change" id="debtChange5">--</span>
+                        </div>
+                        <div class="metric-value" id="debtValue5">₹--</div>
+                        <div class="metric-subtext" id="debtSubtext5">Debt-to-equity ratio</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">👥 Subscribers</span>
+                            <span class="metric-change" id="subsChange5">--</span>
+                        </div>
+                        <div class="metric-value" id="subsValue5">--M</div>
+                        <div class="metric-subtext" id="subsSubtext5">Active user base</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label-wrapper">
+                                <span class="metric-label">📱 ARPU</span>
+                                <span class="metric-description">Average Revenue Per User</span>
+                            </div>
+                            <span class="metric-change" id="arpuChange5">--</span>
+                        </div>
+                        <div class="metric-value" id="arpuValue5">₹--</div>
+                        <div class="metric-subtext" id="arpuSubtext5">Avg revenue per user/month</div>
+                    </div>
+                </div>
+
+                <div class="credit-rating-display">
+                    <div class="rating-badge" id="ratingBadge5">--</div>
+                    <div class="rating-info">
+                        <div class="rating-title">Credit Rating</div>
+                        <div class="rating-description" id="ratingDescription5">Calculating financial health...</div>
+                    </div>
+                </div>
+
+                <div class="impact-alert" id="impactAlert5" style="display:none;">
+                    <strong>⚠️ Financial Impact:</strong> <span id="impactText5"></span>
+                </div>
+            </div>
+
+            <button class="analysis-reveal-btn" onclick="showAnalysisPage(5)">Analysis</button>
+        </div>
+
+        <div class="analysis-detail-page" id="detailPage5" style="display:none;">
+            <div class="data-point">
+                <h4>📊 Terminal State Metrics (2020)</h4>
+                <p>VodafoneIdea had become a <strong>zombie company</strong>: Quarterly losses of ₹7,000 crore, subscriber base declining 3-4% monthly (240 million from peak 320 million), ARPU at ₹109 versus Airtel's ₹162, network investment frozen for 24 months causing 40% drop in 4G speeds, vendor dues of ₹25,000 crore unpaid, credit rating: D (default category).</p>
+            </div>
+            <div class="data-point">
+                <h4>🎯 What Actually Happened</h4>
+                <p>VodafoneIdea chose <strong>Option B</strong> - accepted government equity infusion (₹16,000 crore debt-to-equity conversion giving government 33% stake later increased to 49%). Promoters (Vodafone Plc + Aditya Birla Group) reduced to 25% combined stake. Company rebranded to "Vi" and bet on tariff increases and 5G recovery.</p>
+            </div>
+            <div class="data-point">
+                <h4>💰 Survival Cost vs Recovery Probability</h4>
+                <div class="chart-container">
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar-label">Survival Investment Needed</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 90%;">₹45,000 Cr</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Market Recovery Scenario</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 35%;">35% probability</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Subscriber Decline Rate</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 75%;">-3.2% monthly</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p><strong>Investment requirements for survival:</strong><br>
+                • 5G rollout: ₹25,000 crore (competitors investing ₹40,000+ crore each)<br>
+                • 4G network densification: ₹12,000 crore<br>
+                • Vendor clearances: ₹8,000 crore<br>
+                • Working capital: ₹5,000 crore<br>
+                Total: ₹50,000 crore over 3 years<br><br>
+                <strong>But with subscriber loss of 3.2% monthly:</strong><br>
+                • Would need market share of 15-18% by 2023 just to breakeven<br>
+                • Actual market share trajectory: 22% (2020) → 18% (2021) → 14% (2022) → 11% (2023)<br>
+                • Investment returns: Negative NPV of ₹22,000 crore over 5 years</p>
+            </div>
+            <div class="data-point">
+                <h4>🔍 The Tariff Increase Mirage</h4>
+                <p><strong>Industry prayer:</strong> If tariffs increase from ₹120 to ₹200 ARPU, all operators become profitable and Vi survives.<br><br>
+                <strong>Reality check:</strong><br>
+                • Airtel & Jio increased tariffs 25% in Nov 2021. Vi couldn't match fully due to network quality issues<br>
+                • Premium customers (who pay higher tariffs) were already on Airtel/Jio. Vi's customer base was 60% low-ARPU users<br>
+                • Price increases accelerated subscriber loss for Vi: -4.8 million in Nov-Dec 2021 alone<br>
+                • Vi's ARPU increased to ₹128 but subscriber decline meant revenue still fell 2% quarterly<br>
+                • Airtel benefited fully: ARPU to ₹178, revenue +8% quarterly<br><br>
+                <strong>Lesson:</strong> Tariff increases help quality operators, hurt struggling ones. Vi needed subscriber stability first, tariff increases second. Got the sequence backwards.</p>
+            </div>
+            <div class="data-point">
+                <h4>📉 Actual Outcome Timeline (2020-2024)</h4>
+                <p>
+                    <span class="outcome-negative">2020:</span> Accepted government bailout, promoter stake diluted to 25%<br>
+                    <span class="outcome-negative">2021:</span> Rebranded to Vi, raised ₹4,500 crore debt (vs ₹25,000 needed), 5G spectrum auction skipped<br>
+                    <span class="outcome-negative">2022:</span> Market share dropped to 14%, quarterly losses continued at ₹6,500 crore average<br>
+                    <span class="outcome-negative">2023:</span> Subscriber base down to 190 million (from 320 million peak), government stake increased to 49%<br>
+                    <span class="outcome-negative">2024:</span> Operating as third player with 11% market share, dependent on government funding for survival<br><br>
+                    <strong>Total value destruction:</strong> Vodafone Plc wrote off ₹3.2 lakh crore (£38 billion) investment. Aditya Birla Group wrote off ₹45,000 crore. Shareholders lost 99.5% of investment.
+                </p>
+            </div>
+            <div class="data-point">
+                <h4>🎲 Alternative History: Clean Exit in 2020 (Option A)</h4>
+                <p><strong>Hypothetical controlled shutdown scenario:</strong><br>
+                • Announce 18-month wind-down plan<br>
+                • Sell spectrum licenses to Airtel (₹28,000 crore) and Jio (₹18,000 crore)<br>
+                • Tower infrastructure to Indus Towers: ₹22,000 crore<br>
+                • Migrate subscribers for fees: ₹8,000 crore<br>
+                • Total asset recovery: ₹76,000 crore<br><br>
+                <strong>Liability settlement:</strong><br>
+                • Priority: AGR dues ₹58,000 crore (avoid criminal liability)<br>
+                • Banks/bondholders: ₹18,000 crore partial settlement (14% recovery)<br>
+                • Vendors: Zero recovery<br><br>
+                <strong>Net outcome:</strong> Vodafone Plc and Birla Group lose entire equity (₹65,000 crore) but avoid further cash bleed of ₹35,000+ crore pumped in 2020-2024. <strong>Net savings: ₹35,000 crore by cutting losses</strong>.<br><br>
+                Versus actual path: Lost equity PLUS threw good money after bad. Government owns 49%, promoters own 8%, public shareholders lost 99.5%.</p>
+            </div>
+            <div class="data-point">
+                <h4>💡 Global Comparison: Vodafone's Other Exit</h4>
+                <p><strong>Vodafone Egypt (Sold 2020):</strong> Facing similar regulatory pressure and market challenges, Vodafone sold Egypt operations to Saudi Telecom for $2.4 billion, booking small loss but preserving capital for African expansion.<br><br>
+                <strong>Vodafone India vs Egypt decision matrix:</strong><br>
+                • Egypt: Market share 40%, EBITDA positive, regulatory risk high → <strong>Sold proactively</strong><br>
+                • India: Market share 22%, EBITDA negative, regulatory risk + debt crisis → <strong>Held on hoping for miracle</strong><br><br>
+                Why different decisions? <strong>Sunk cost fallacy</strong> - Vodafone had invested ₹2 lakh crore in India (10x more than Egypt), couldn't accept total loss. Behavioral economics in action.</p>
+            </div>
+            <div class="data-point">
+                <h4>🏆 Success Case: Telenor India's Smart Exit (2017)</h4>
+                <p>Telenor India recognized post-Jio market was unviable <strong>before</strong> terminal decline. Sold operations to Airtel for ₹0 (zero price) but Airtel assumed liabilities. Telenor avoided:<br>
+                • AGR liability of ₹7,500 crore<br>
+                • Spectrum payment defaults of ₹3,200 crore<br>
+                • Ongoing quarterly losses of ₹800 crore<br><br>
+                <strong>Total saved by early exit: ₹25,000+ crore versus potential 2020 exit.</strong><br><br>
+                Lesson: In terminal situations, exiting at zero price to cap liabilities beats holding for negative value exit.</p>
+            </div>
+            <div class="data-point">
+                <h4>🎯 Final Verdict: What Should Have Been Done</h4>
+                <p><strong>Optimal Decision Timeline:</strong><br>
+                <strong>2015 (Decision 1):</strong> Choose Option B - Invest ₹8,000 crore in network/efficiency. Would have strengthened position pre-Jio.<br>
+                <strong>2016 (Decision 2):</strong> Choose Option B - Premium positioning. Lose market share but protect margins and high-value customers.<br>
+                <strong>2017 (Decision 3):</strong> Choose Option C - Strategic investor (Amazon/Google) instead of merger. Maintain agility, get ₹15,000 crore cash + technology.<br>
+                <strong>2019 (Decision 4):</strong> Choose Option C - Controlled exit immediately post-AGR verdict. Recover ₹20,000 crore, avoid 3 years of cash burn.<br>
+                <strong>2020 (Decision 5):</strong> Not reached in optimal path - company already sold/restructured.<br><br>
+                <strong>Total value preservation in optimal path:</strong> ₹45,000 crore vs actual: Zero (99.5% loss)<br><br>
+                <strong>The Meta-Learning:</strong> Each decision seemed marginally acceptable in isolation. But decisions compound. One defensive decision (maintaining status quo in 2015) led to panic response (price war participation in 2016) which led to desperation move (merger in 2017) which led to catastrophic crisis (AGR shock) which led to terminal state (zombie company). <br><br>
+                <strong>Strategic courage early in crisis trajectory</strong> (accepting market share loss, raising equity, or exiting) would have preserved billions. Incrementalism in crisis compounds into catastrophe.
+                </p>
+            </div>
+            <div class="key-learnings">
+                <h3>🎓 Key Strategic Learnings</h3>
+                <ul>
+                    <li><span class="learning-category">Financial Learning</span><br><strong>Sunk cost fallacy is most expensive in crisis:</strong> Vodafone's ₹2 lakh crore prior investment clouded judgment. The right question wasn't "how much have we invested" but "what's the forward-looking NPV". Answer: Deeply negative.</li>
+                    <li><div class="learning-category">Strategic Learning</div>
+                        <strong>Zombie companies destroy more value than clean exits:</strong> Vi's 2020-2024 zombie period consumed ₹35,000 crore additional capital with zero value creation. Clean exit would have capped losses.</li>
+                    <li><strong>Government bailouts delay inevitable in broken business models:</strong> Government support gave survival without fixing core issues: network quality, subscriber trust, cost structure. Prolonged pain without recovery.</li>
+                    <li><strong>Market leadership in declining industries is value trap:</strong> Being 2nd largest operator while losing money is worse than profitable #3 position. Vi confused market share with strategic value.</li>
+                    <li><span class="learning-category">Leadership Learning</span><br><strong>Controlled exits preserve strategic options:</strong> Telenor's 2017 exit allowed redeployment to Myanmar and Bangladesh. Vi's 2020+ zombie mode trapped capital with zero optionality.</li>
+                    <li><span class="learning-category">Leadership Learning</span><br><strong>Hope-based strategies always fail:</strong> "Hoping for tariff increases" or "hoping for government relief" or "hoping for market consolidation" isn't strategy. Strategy requires creating conditions for success, not waiting for external salvation.</li>
+                    <li><strong>Exit timing determines total loss magnitude:</strong> 2017 exit (Telenor): Manageable loss. 2019 exit: Painful but recoverable. 2020 exit: Severe loss. 2022+: Total wipeout. Each year of delay multiplied losses geometrically.</li>
+                </ul>
+            </div>
+            <button class="next-button" onclick="window.location.reload()">Play Again →</button>
+        </div>
+        </div>
+
+    </div>
+
+    <script>
+        let decisions = {};
+        let performanceCharts = {};
+
+        
+        function showAnalysisPage(decisionNum) {
+            // Hide graph page
+            const graphPage = document.getElementById('graphPage' + decisionNum);
+            if (graphPage) graphPage.style.display = 'none';
+
+            // Show detail page
+            const detailPage = document.getElementById('detailPage' + decisionNum);
+            if (detailPage) detailPage.style.display = 'block';
+
+            // Scroll to very top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function selectOption(decisionNum, option) {
+            decisions[decisionNum] = option;
+
+            // Hide ALL decisions and analyses
+            for (let i = 1; i <= 5; i++) {
+                const dec = document.getElementById('decision' + i);
+                const ana = document.getElementById('analysis' + i);
+                if (dec) dec.style.display = 'none';
+                if (ana) ana.style.display = 'none';
+            }
+
+            // Show analysis section (graph page only, detail page stays hidden)
+            const analysisSection = document.getElementById('analysis' + decisionNum);
+            const detailPage = document.getElementById('detailPage' + decisionNum);
+            if (detailPage) detailPage.style.display = 'none';
+
+            analysisSection.style.display = 'block';
+            analysisSection.classList.add('show');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Create performance graph after short delay
+            setTimeout(() => {
+                createPerformanceGraph(decisionNum, option);
+                updateBalanceSheet(decisionNum, option);
+            }, 300);
+        }
+
+        function createPerformanceGraph(decisionNum, selectedOption) {
+            const canvas = document.getElementById('performanceChart' + decisionNum);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Different data for each decision
+            const graphData = getGraphData(decisionNum, selectedOption);
+            
+            if (performanceCharts[decisionNum]) {
+                performanceCharts[decisionNum].destroy();
+            }
+            
+            performanceCharts[decisionNum] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: graphData.labels,
+                    datasets: [
+                        {
+                            label: 'Option A Impact',
+                            data: graphData.optionA,
+                            borderColor: selectedOption === 'A' ? '#4CAF50' : 'rgba(76, 175, 80, 0.3)',
+                            backgroundColor: selectedOption === 'A' ? 'rgba(76, 175, 80, 0.1)' : 'transparent',
+                            borderWidth: selectedOption === 'A' ? 4 : 2,
+                            tension: 0.4,
+                            fill: selectedOption === 'A'
+                        },
+                        {
+                            label: 'Option B Impact',
+                            data: graphData.optionB,
+                            borderColor: selectedOption === 'B' ? '#2196F3' : 'rgba(33, 150, 243, 0.3)',
+                            backgroundColor: selectedOption === 'B' ? 'rgba(33, 150, 243, 0.1)' : 'transparent',
+                            borderWidth: selectedOption === 'B' ? 4 : 2,
+                            tension: 0.4,
+                            fill: selectedOption === 'B'
+                        },
+                        {
+                            label: 'Option C Impact',
+                            data: graphData.optionC,
+                            borderColor: selectedOption === 'C' ? '#FF9800' : 'rgba(255, 152, 0, 0.3)',
+                            backgroundColor: selectedOption === 'C' ? 'rgba(255, 152, 0, 0.1)' : 'transparent',
+                            borderWidth: selectedOption === 'C' ? 4 : 2,
+                            tension: 0.4,
+                            fill: selectedOption === 'C'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Revenue Performance (₹ Crores)',
+                            color: '#D4AF37',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(42, 42, 42, 0.95)',
+                            titleColor: '#D4AF37',
+                            bodyColor: '#F5F5DC',
+                            borderColor: '#DC143C',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#F5F5DC',
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#F5F5DC'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        function getGraphData(decisionNum, selectedOption) {
+            const data = {
+                1: {
+                    labels: ['Q1 2015', 'Q3 2015', 'Q1 2016', 'Q3 2016', 'Q1 2017', 'Q3 2017'],
+                    optionA: [11500, 11600, 11400, 10200, 8500, 7800], // Status quo - gradual decline
+                    optionB: [11500, 11200, 11000, 10800, 11200, 11800], // Investment - short dip, then recovery
+                    optionC: [11500, 12200, 12800, 11500, 9200, 8100]  // Aggressive expansion - spike then crash
+                },
+                2: {
+                    labels: ['Q3 2016', 'Q1 2017', 'Q3 2017', 'Q1 2018', 'Q3 2018'],
+                    optionA: [10200, 8500, 7800, 7200, 6800], // Price matching - steep decline
+                    optionB: [10200, 9800, 9400, 9200, 9500], // Premium strategy - slow decline then stabilize
+                    optionC: [10200, 9200, 8800, 8600, 8900]  // Exit circles - medium decline
+                },
+                3: {
+                    labels: ['Q1 2017', 'Q3 2017', 'Q1 2018', 'Q3 2018', 'Q1 2019'],
+                    optionA: [15600, 14200, 12800, 11500, 10800], // Merger - combined revenue but declining
+                    optionB: [7800, 7400, 7200, 7400, 7800],      // Independent - stable lower revenue
+                    optionC: [7800, 8600, 9200, 9800, 10200]      // Strategic investor - growth
+                },
+                4: {
+                    labels: ['Q3 2019', 'Q1 2020', 'Q3 2020', 'Q1 2021', 'Q3 2021'],
+                    optionA: [10800, 9200, 7500, 6200, 5100], // Debt to pay - revenue collapse
+                    optionB: [10800, 10200, 9800, 9600, 10100], // Seek relief - stabilize
+                    optionC: [10800, 9500, 8200, 6500, 4800]  // Exit - wind down
+                },
+                5: {
+                    labels: ['Q1 2020', 'Q3 2020', 'Q1 2021', 'Q3 2021', 'Q1 2022', 'Q3 2022'],
+                    optionA: [9200, 7800, 6200, 4500, 2800, 1200], // Complete exit - wind down
+                    optionB: [9200, 8900, 8800, 9100, 9400, 9600], // Government support - slow recovery
+                    optionC: [9200, 9600, 10200, 10800, 11500, 12200] // Domestic investor - growth
+                }
+            };
+            
+            return data[decisionNum];
+        }
+
+        // Balance Sheet Update Function - Realistic Fintech Dashboard
+        function updateBalanceSheet(decisionNum, option) {
+            // Financial data for each decision and option combination
+            const financialData = {
+                1: { // Decision 1: Pre-Jio Strategy (2015)
+                    A: { // Status Quo
+                        cash: 8500, cashChange: 'neutral', cashSubtext: 'Minimal investment, slow burn',
+                        debt: 35000, debtChange: 'neutral', debtSubtext: 'D/E ratio: 1.2x',
+                        subs: 205, subsChange: 'neutral', subsSubtext: 'Market share: 23%',
+                        arpu: 190, arpuChange: 'neutral', arpuSubtext: 'Industry average',
+                        rating: 'BBB', ratingDesc: 'Stable but unprepared for disruption. Adequate liquidity but no competitive moat.',
+                        impact: 'Maintaining status quo preserves short-term cash but leaves cost structure vulnerable. No strategic buffer for competitive threats.'
+                    },
+                    B: { // Network Investment
+                        cash: 4200, cashChange: 'negative', cashSubtext: 'Heavy CAPEX deployment',
+                        debt: 41000, debtChange: 'negative', debtSubtext: 'D/E ratio: 1.4x',
+                        subs: 208, subsChange: 'positive', subsSubtext: 'Market share: 23.5%',
+                        arpu: 195, arpuChange: 'positive', arpuSubtext: '4G premium pricing',
+                        rating: 'BBB', ratingDesc: 'Short-term pressure, long-term strength. Strategic investment reduces future operating costs by 40%.',
+                        impact: 'Aggressive investment strains liquidity now but creates structural cost advantage. Cost per GB drops from ₹0.85 to ₹0.45 by 2017.'
+                    },
+                    C: { // Debt-Fueled Expansion
+                        cash: 11200, cashChange: 'positive', cashSubtext: 'Debt-funded liquidity',
+                        debt: 47000, debtChange: 'negative', debtSubtext: 'D/E ratio: 1.7x (dangerous)',
+                        subs: 218, subsChange: 'positive', subsSubtext: 'Market share: 24.5%',
+                        arpu: 185, arpuChange: 'neutral', arpuSubtext: 'Promo-driven growth',
+                        rating: 'BB', ratingDesc: 'High risk. Excessive leverage with no disruption buffer. Debt servicing consumes 35% of EBITDA.',
+                        impact: 'Borrowed growth masks structural weakness. When Jio launches, debt burden becomes existential threat with zero financial flexibility.'
+                    }
+                },
+                2: { // Decision 2: Jio Price War Response (2016)
+                    A: { // Price Matching
+                        cash: 3200, cashChange: 'negative', cashSubtext: 'Bleeding ₹800Cr/month',
+                        debt: 41000, debtChange: 'neutral', debtSubtext: 'D/E ratio: 2.8x',
+                        subs: 215, subsChange: 'positive', subsSubtext: 'Retention focus',
+                        arpu: 95, arpuChange: 'negative', arpuSubtext: '↓50% in 6 months',
+                        rating: 'B', ratingDesc: 'Severe distress. Price cuts without cost structure fix = revenue collapse. EBITDA margins crash to 8%.',
+                        impact: 'Matching Jio pricing with 7x cost disadvantage accelerates cash burn. ₹9,500 crore lost in 18 months with no path to profitability.'
+                    },
+                    B: { // Premium Strategy
+                        cash: 6800, cashChange: 'neutral', cashSubtext: 'Controlled decline',
+                        debt: 38000, debtChange: 'positive', debtSubtext: 'D/E ratio: 2.1x',
+                        subs: 188, subsChange: 'negative', subsSubtext: '↓8% subscriber base',
+                        arpu: 142, arpuChange: 'neutral', arpuSubtext: 'Premium positioning',
+                        rating: 'BB', ratingDesc: 'Defensive stability. Sacrifices volume for margins. Buys 12-18 months to restructure or find strategic partner.',
+                        impact: 'Loses market share but preserves financial viability. EBITDA stays at 18-20%, creating merger negotiation leverage.'
+                    },
+                    C: { // Circle Exit
+                        cash: 8200, cashChange: 'positive', cashSubtext: 'Asset monetization',
+                        debt: 34500, debtChange: 'positive', debtSubtext: 'D/E ratio: 1.8x',
+                        subs: 178, subsChange: 'negative', subsSubtext: '↓13% from exits',
+                        arpu: 155, arpuChange: 'positive', arpuSubtext: 'Focus on metros',
+                        rating: 'BBB', ratingDesc: 'Strategic retreat. Converting uneconomical assets to cash while reinforcing profitable markets.',
+                        impact: 'Selling 8 loss-making circles raises ₹12,000 crore, reducing debt and focusing on top 15 cities where infrastructure advantage exists.'
+                    }
+                },
+                3: { // Decision 3: Merger Decision (2017)
+                    A: { // Merge with Idea
+                        cash: 4100, cashChange: 'neutral', cashSubtext: 'Combined entity',
+                        debt: 112000, debtChange: 'negative', debtSubtext: 'D/E ratio: 7.2x (crisis)',
+                        subs: 408, subsChange: 'positive', subsSubtext: '#1 market position',
+                        arpu: 108, arpuChange: 'negative', arpuSubtext: 'Pressure continues',
+                        rating: 'CCC', ratingDesc: 'Distressed merger. Combined debt ₹1.12 lakh crore with overlapping networks. No synergy realization for 24+ months.',
+                        impact: 'Two weak players merge = bigger weak player. Debt servicing alone needs ₹15,000 crore annually while losing ₹4,500 crore in EBITDA.'
+                    },
+                    B: { // Stay Independent
+                        cash: 5200, cashChange: 'positive', cashSubtext: 'Asset-light focus',
+                        debt: 37000, debtChange: 'positive', debtSubtext: 'D/E ratio: 2.0x',
+                        subs: 175, subsChange: 'negative', subsSubtext: 'Smaller but viable',
+                        arpu: 135, arpuChange: 'positive', arpuSubtext: 'Premium niche',
+                        rating: 'BB', ratingDesc: 'Stable retreat. Becomes #4 player but maintains positive cash flow in enterprise and premium urban segments.',
+                        impact: 'Avoids merger complexity. Focus on enterprise (20% margins) and metros. Smaller but sustainable with acquisition potential later.'
+                    },
+                    C: { // Strategic Investor
+                        cash: 12500, cashChange: 'positive', cashSubtext: 'PE/Strategic capital',
+                        debt: 28000, debtChange: 'positive', debtSubtext: 'D/E ratio: 1.1x',
+                        subs: 182, subsChange: 'neutral', subsSubtext: 'Stabilized base',
+                        arpu: 145, arpuChange: 'positive', arpuSubtext: 'Investment in quality',
+                        rating: 'BBB', ratingDesc: 'Equity infusion transforms balance sheet. ₹18,000 crore from KKR/Brookfield clears debt, funds 5G transition.',
+                        impact: 'Dilution: 35% stake for capital, but creates path to profitability. New investors bring operational expertise and global best practices.'
+                    }
+                },
+                4: { // Decision 4: AGR Crisis (2019)
+                    A: { // Pay AGR Immediately
+                        cash: 800, cashChange: 'negative', cashSubtext: 'Near-zero liquidity',
+                        debt: 118000, debtChange: 'neutral', debtSubtext: 'D/E ratio: 18.5x',
+                        subs: 295, subsChange: 'negative', subsSubtext: 'Subscriber exodus',
+                        arpu: 102, arpuChange: 'negative', arpuSubtext: 'No investment capacity',
+                        rating: 'D', ratingDesc: 'Default imminent. Paying ₹28,000 crore AGR depletes all reserves. Cannot fund operations or network maintenance.',
+                        impact: 'Compliance triggers insolvency. No cash for salaries, vendor payments, or spectrum fees. Government becomes largest creditor.'
+                    },
+                    B: { // Seek Relief
+                        cash: 4200, cashChange: 'neutral', cashSubtext: 'Extended timeline',
+                        debt: 97000, debtChange: 'positive', debtSubtext: 'D/E ratio: 5.8x',
+                        subs: 302, subsChange: 'neutral', subsSubtext: 'Stabilizing',
+                        arpu: 115, arpuChange: 'positive', arpuSubtext: 'Tariff normalization',
+                        rating: 'B', ratingDesc: 'Legal relief provides breathing room. 10-year payment plan (₹2,800 crore/year) is manageable with tariff increases.',
+                        impact: 'Supreme Court relief spreads AGR over decade. Combined with 20-25% tariff hikes, creates narrow path to solvency if execution perfect.'
+                    },
+                    C: { // Exit Market
+                        cash: 6500, cashChange: 'positive', cashSubtext: 'Liquidation proceeds',
+                        debt: 85000, debtChange: 'positive', debtSubtext: 'Residual obligations',
+                        subs: 0, subsChange: 'negative', subsSubtext: 'Full exit',
+                        arpu: 0, arpuChange: 'negative', arpuSubtext: 'Operations ceased',
+                        rating: 'D', ratingDesc: 'Controlled liquidation. Selling spectrum, towers, and fiber to Jio/Airtel. Creditors recover 40-50 paise per rupee.',
+                        impact: 'Orderly shutdown better than insolvency. Spectrum sale to Airtel raises ₹35,000 crore. Employees transferred with assets.'
+                    }
+                },
+                5: { // Decision 5: Final Endgame (2020)
+                    A: { // Complete Exit
+                        cash: 4200, cashChange: 'neutral', cashSubtext: 'Wind-down reserve',
+                        debt: 65000, debtChange: 'positive', debtSubtext: 'Haircut negotiated',
+                        subs: 0, subsChange: 'negative', subsSubtext: 'Subscriber transfer',
+                        arpu: 0, arpuChange: 'negative', arpuSubtext: 'Market exit',
+                        rating: 'D', ratingDesc: 'Voluntary liquidation. Asset sale covers 55% of debt. Vodafone UK writes off ₹45,000 crore India investment.',
+                        impact: '₹3.1 lakh crore value destroyed since 2016. Becomes case study in: competitive misjudgment, debt traps, regulatory risk.'
+                    },
+                    B: { // Government Support
+                        cash: 5800, cashChange: 'positive', cashSubtext: 'Relief package',
+                        debt: 78000, debtChange: 'positive', debtSubtext: 'D/E ratio: 3.2x',
+                        subs: 245, subsChange: 'positive', subsSubtext: '#3 player',
+                        arpu: 148, arpuChange: 'positive', arpuSubtext: 'Tariff discipline',
+                        rating: 'BB', ratingDesc: 'Government converts dues to equity (33% stake). 4-year moratorium on spectrum, AGR payments creates stability window.',
+                        impact: 'Nationalization-lite keeps #3 player alive for strategic autonomy. Prevents duopoly. Requires ₹15,000 crore capital from promoters.'
+                    },
+                    C: { // Domestic Investor
+                        cash: 11200, cashChange: 'positive', cashSubtext: 'Fresh equity',
+                        debt: 58000, debtChange: 'positive', debtSubtext: 'D/E ratio: 1.8x',
+                        subs: 268, subsChange: 'positive', subsSubtext: 'Growth resuming',
+                        arpu: 165, arpuChange: 'positive', arpuSubtext: '5G readiness',
+                        rating: 'BBB', ratingDesc: 'Tata/Adani consortium invests ₹28,000 crore for 51% stake. Brings tower assets, fiber, and enterprise synergies.',
+                        impact: 'Industrial house backing provides credibility. Integrated telecom-to-digital strategy. Becomes India-focused challenger in 5G era.'
+                    }
+                }
+            };
+
+            const data = financialData[decisionNum][option];
+            
+            // Animate metric cards
+            const metricCards = document.querySelectorAll(`#balanceSheet${decisionNum} .metric-card`);
+            metricCards.forEach(card => {
+                card.classList.remove('updated');
+                setTimeout(() => card.classList.add('updated'), 100);
+            });
+
+            // Update Cash
+            document.getElementById(`cashValue${decisionNum}`).textContent = `₹${data.cash.toLocaleString()}Cr`;
+            document.getElementById(`cashChange${decisionNum}`).textContent = 
+                data.cashChange === 'positive' ? '↑' : data.cashChange === 'negative' ? '↓' : '→';
+            document.getElementById(`cashChange${decisionNum}`).className = `metric-change ${data.cashChange}`;
+            document.getElementById(`cashSubtext${decisionNum}`).textContent = data.cashSubtext;
+
+            // Update Debt
+            document.getElementById(`debtValue${decisionNum}`).textContent = `₹${data.debt.toLocaleString()}Cr`;
+            document.getElementById(`debtChange${decisionNum}`).textContent = 
+                data.debtChange === 'positive' ? '↓' : data.debtChange === 'negative' ? '↑' : '→';
+            document.getElementById(`debtChange${decisionNum}`).className = 
+                `metric-change ${data.debtChange === 'positive' ? 'positive' : data.debtChange === 'negative' ? 'negative' : 'neutral'}`;
+            document.getElementById(`debtSubtext${decisionNum}`).textContent = data.debtSubtext;
+
+            // Update Subscribers
+            document.getElementById(`subsValue${decisionNum}`).textContent = `${data.subs}M`;
+            document.getElementById(`subsChange${decisionNum}`).textContent = 
+                data.subsChange === 'positive' ? '↑' : data.subsChange === 'negative' ? '↓' : '→';
+            document.getElementById(`subsChange${decisionNum}`).className = `metric-change ${data.subsChange}`;
+            document.getElementById(`subsSubtext${decisionNum}`).textContent = data.subsSubtext;
+
+            // Update ARPU
+            document.getElementById(`arpuValue${decisionNum}`).textContent = `₹${data.arpu}`;
+            document.getElementById(`arpuChange${decisionNum}`).textContent = 
+                data.arpuChange === 'positive' ? '↑' : data.arpuChange === 'negative' ? '↓' : '→';
+            document.getElementById(`arpuChange${decisionNum}`).className = `metric-change ${data.arpuChange}`;
+            document.getElementById(`arpuSubtext${decisionNum}`).textContent = data.arpuSubtext;
+
+            // Update Credit Rating
+            const ratingBadge = document.getElementById(`ratingBadge${decisionNum}`);
+            ratingBadge.textContent = data.rating;
+            ratingBadge.className = `rating-badge rating-${data.rating}`;
+            document.getElementById(`ratingDescription${decisionNum}`).textContent = data.ratingDesc;
+
+            // Show Impact Alert
+            const impactAlert = document.getElementById(`impactAlert${decisionNum}`);
+            document.getElementById(`impactText${decisionNum}`).textContent = data.impact;
+            impactAlert.style.display = 'block';
+
+            // Animate the entire balance sheet
+            const balanceSheet = document.getElementById(`balanceSheet${decisionNum}`);
+            balanceSheet.style.opacity = '0';
+            balanceSheet.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                balanceSheet.style.transition = 'all 0.6s ease-out';
+                balanceSheet.style.opacity = '1';
+                balanceSheet.style.transform = 'translateY(0)';
+            }, 400);
+        }
+
+        function showDecision(num) {
+            // Hide ALL decision cards and analysis sections
+            for (let i = 1; i <= 5; i++) {
+                const dec = document.getElementById('decision' + i);
+                const ana = document.getElementById('analysis' + i);
+                if (dec) dec.style.display = 'none';
+                if (ana) ana.style.display = 'none';
+            }
+
+            // Show only the target decision card
+            const target = document.getElementById('decision' + num);
+            if (target) {
+                target.classList.remove('hidden');
+                target.style.display = 'block';
+            }
+
+            // Scroll to very top of page
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Animate bars on analysis show
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const bars = entry.target.querySelectorAll('.bar-fill');
+                    bars.forEach((bar, index) => {
+                        setTimeout(() => {
+                            bar.style.width = bar.style.width; // Trigger animation
+                        }, index * 200);
+                    });
+                }
+            });
+        });
+
+        document.querySelectorAll('.analysis-section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
